@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "782286485249",
+    "project_id": "airsense-cf390",
+    "storage_bucket": "airsense-cf390.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:782286485249:android:2e4f562335b9a548a58d00",
+        "android_client_info": {
+          "package_name": "com.example.indoor_air_quality_check"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": ""
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
