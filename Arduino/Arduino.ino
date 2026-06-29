@@ -3,12 +3,14 @@
 #include <DHT.h>
 #include <Wire.h>
 
-// WiFi credentials
-const char *ssid = "SSN";
-const char *password = "Ssn1!Som2@Sase3#";
+// Real credentials live in secrets.h (gitignored). Copy secrets.example.h to
+// secrets.h and fill in your values. Defines: WIFI_SSID, WIFI_PASSWORD,
+// FIREBASE_HOST, FIREBASE_AUTH.
+#include "secrets.h"
 
-#define FIREBASE_HOST "https://airsense-cf390-default-rtdb.asia-southeast1.firebasedatabase.app/"
-#define FIREBASE_AUTH "1aed1e832d1f021e2b646cef856003ed0b31d0a0" 
+// WiFi credentials
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
 
 // MQTT Broker details
 const char *mqtt_broker = "broker.emqx.io";
