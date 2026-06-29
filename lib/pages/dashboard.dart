@@ -31,6 +31,8 @@ class _DashboardState extends State<Dashboard> {
   late String PPM = "";
 
   late final streamData = FirebaseDatabase.instance.ref().child('UsersData').child('hpS18ECifIcqyTDPNDw84Cjd5ck2').child('readings').child('air').onValue;
+  // Predictive forecast written by the forecast_air_quality Cloud Function.
+  late final forecastStream = FirebaseDatabase.instance.ref().child('UsersData').child('hpS18ECifIcqyTDPNDw84Cjd5ck2').child('readings').child('forecast').onValue;
 
   int selectedIndex = 0;
   late var stream = positiveDataStream(selectedIndex);
@@ -429,6 +431,7 @@ class _DashboardState extends State<Dashboard> {
                         // ),
                       ]
                   ),
+                  _forecastBanner(),
                   Row(
                     children: [
                       const Padding(
@@ -517,6 +520,54 @@ class _DashboardState extends State<Dashboard> {
         return Text('....');
       }
      );
+  }
+
+  // Predictive banner: reads the Cloud Function's /readings/forecast node and
+  // shows the upcoming air-quality prediction (proactive, not just reactive).
+  Widget _forecastBanner() {
+    return StreamBuilder(
+      stream: forecastStream,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
+          return const SizedBox.shrink();
+        }
+        final f = snapshot.data!.snapshot.value as Map;
+        if (f['status'] == 'warming_up') {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
+            child: Text(
+              "Collecting data for forecast… (${f['have']}/${f['need']})",
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+          );
+        }
+        final predicted = (f['predicted_ppm'] as num?)?.toDouble() ?? 0.0;
+        final willExceed = f['willExceedThreshold'] == true;
+        final color = willExceed ? Colors.deepOrange : Colors.green;
+        final msg = willExceed
+            ? "Air quality predicted to worsen soon (≈ ${predicted.toStringAsFixed(0)} ppm). Consider ventilating."
+            : "Air quality predicted to stay healthy (≈ ${predicted.toStringAsFixed(0)} ppm).";
+        return Container(
+          margin: const EdgeInsets.fromLTRB(15, 12, 15, 0),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: color),
+          ),
+          child: Row(
+            children: [
+              Icon(willExceed ? Icons.warning_amber_rounded : Icons.check_circle_outline,
+                  color: color),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(msg, style: TextStyle(color: color, fontSize: 14)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget qualityStatus(double x){
